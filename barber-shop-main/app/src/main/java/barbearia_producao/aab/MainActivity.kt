@@ -1,4 +1,4 @@
-package com.math.barbershop
+package barbearia_producao.aab
 
 import android.content.Intent
 import android.graphics.Color
@@ -7,8 +7,8 @@ import android.os.Bundle
 import android.view.View
 import com.google.android.material.snackbar.Snackbar
 import android.net.Uri
-import com.math.barbershop.databinding.ActivityMainBinding
-import com.math.barbershop.view.Home
+import barbearia_producao.aab.databinding.ActivityMainBinding
+import barbearia_producao.aab.view.Home
 
 class MainActivity : AppCompatActivity() {
 

@@ -1,4 +1,4 @@
-package com.math.barbershop.model
+package barbearia_producao.aab.model
 
 data class Services(
     val img: Int? = null,

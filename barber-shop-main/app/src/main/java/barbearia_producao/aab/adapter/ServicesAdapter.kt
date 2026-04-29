@@ -1,11 +1,11 @@
-package com.math.barbershop.adapter
+package barbearia_producao.aab.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.math.barbershop.databinding.ServicesItemBinding
-import com.math.barbershop.model.Services
+import barbearia_producao.aab.databinding.ServicesItemBinding
+import barbearia_producao.aab.model.Services
 
 class ServicesAdapter(
     private val context: Context,

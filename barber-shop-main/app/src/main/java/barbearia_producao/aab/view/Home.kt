@@ -1,14 +1,14 @@
-package com.math.barbershop.view
+package barbearia_producao.aab.view
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.GridLayout
 import androidx.recyclerview.widget.GridLayoutManager
-import com.math.barbershop.R
-import com.math.barbershop.adapter.ServicesAdapter
-import com.math.barbershop.databinding.ActivityHomeBinding
-import com.math.barbershop.model.Services
+import barbearia_producao.aab.R
+import barbearia_producao.aab.adapter.ServicesAdapter
+import barbearia_producao.aab.databinding.ActivityHomeBinding
+import barbearia_producao.aab.model.Services
 
 class Home : AppCompatActivity() {
 

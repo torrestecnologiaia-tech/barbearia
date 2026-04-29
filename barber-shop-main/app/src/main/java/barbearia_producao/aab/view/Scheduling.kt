@@ -1,4 +1,4 @@
-package com.math.barbershop.view
+package barbearia_producao.aab.view
 
 import android.graphics.Color
 import android.os.Build
@@ -8,7 +8,7 @@ import android.view.View
 import androidx.annotation.RequiresApi
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.firestore.FirebaseFirestore
-import com.math.barbershop.databinding.ActivitySchedulingBinding
+import barbearia_producao.aab.databinding.ActivitySchedulingBinding
 import java.util.Calendar
 
 class Scheduling : AppCompatActivity() {

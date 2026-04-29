@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.math.barbershop"
+    namespace = "barbearia_producao.aab"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.math.barbershop"
+        applicationId = "barbearia_producao.aab"
         minSdk = 24
         targetSdk = 33
         versionCode = 1
