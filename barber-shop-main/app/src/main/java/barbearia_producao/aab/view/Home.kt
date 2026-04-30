@@ -40,14 +40,14 @@ class Home : AppCompatActivity() {
 
         binding.textName.text = "Bem-vindo(a), ${name}!"
         
-        // Configura Portfólio (Horizontal)
+        // (Portfolio code same as before...)
         val recyclerViewPortfolio = binding.recyclerViewPortfolio
         recyclerViewPortfolio.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         portfolioAdapter = PortfolioAdapter(this, listPortfolio)
         recyclerViewPortfolio.setHasFixedSize(true)
         recyclerViewPortfolio.adapter = portfolioAdapter
         
-        // Configura Serviços (Grid)
+        // (Services code updated to fetch from Firebase)
         val recyclerViewServices = binding.recycleViewService
         recyclerViewServices.layoutManager = GridLayoutManager(this, 2)
         servicesAdapter = ServicesAdapter(this, listServices) { service ->
@@ -62,10 +62,12 @@ class Home : AppCompatActivity() {
         }
         recyclerViewServices.adapter = servicesAdapter
         
-        getService()
+        getDynamicServices() // Atualizado
         getPortfolio()
 
         binding.btnSchedule.setOnClickListener {
+            if (listServices.isEmpty()) return@setOnClickListener
+            
             if (selectedService == null) {
                 selectedService = listServices[0].name
                 selectedPrice = listServices[0].price
@@ -107,14 +109,38 @@ class Home : AppCompatActivity() {
             .show()
     }
 
-    private fun getService() {
-        listServices.clear()
-        listServices.add(Services(R.drawable.img1, "Cortes", "R$ 30,00"))
-        listServices.add(Services(R.drawable.img2, "Corte de barba", "R$ 20,00"))
-        listServices.add(Services(R.drawable.img3, "Corte especiais", "R$ 50,00"))
-        listServices.add(Services(R.drawable.img4, "Tratamento", "R$ 40,00"))
-        listServices.add(Services(R.drawable.img1, "Luzes", "R$ 100,00"))
-        servicesAdapter.notifyDataSetChanged()
+    private fun getDynamicServices() {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("servicos")
+            .addSnapshotListener { value, error ->
+                if (error != null) return@addSnapshotListener
+                
+                listServices.clear()
+                
+                if (value == null || value.isEmpty) {
+                    // Se estiver vazio no Firebase, preenche com padrões e salva lá
+                    seedDefaultServices()
+                } else {
+                    value.documents.forEach { doc ->
+                        val name = doc.getString("name") ?: ""
+                        val price = doc.getString("price") ?: ""
+                        // Nota: Para ícones, usaremos um ícone de tesoura padrão se for dinâmico
+                        listServices.add(Services(R.drawable.img1, name, price))
+                    }
+                    servicesAdapter.notifyDataSetChanged()
+                }
+            }
+    }
+
+    private fun seedDefaultServices() {
+        val db = FirebaseFirestore.getInstance()
+        val defaults = listOf(
+            mapOf("name" to "Cortes", "price" to "R$ 30,00"),
+            mapOf("name" to "Corte de barba", "price" to "R$ 20,00"),
+            mapOf("name" to "Corte especiais", "price" to "R$ 50,00"),
+            mapOf("name" to "Tratamento", "price" to "R$ 40,00")
+        )
+        defaults.forEach { db.collection("servicos").add(it) }
     }
     
     private fun getPortfolio() {
@@ -128,6 +154,7 @@ class Home : AppCompatActivity() {
                 value?.documents?.forEach { doc ->
                     val portfolio = doc.toObject(Portfolio::class.java)
                     if (portfolio != null) {
+                        portfolio.id = doc.id
                         listPortfolio.add(portfolio)
                     }
                 }
