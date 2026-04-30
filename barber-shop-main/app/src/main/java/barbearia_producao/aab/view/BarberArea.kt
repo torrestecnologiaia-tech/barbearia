@@ -30,6 +30,7 @@ class BarberArea : AppCompatActivity() {
             uri?.let {
                 imageUri = it
                 binding.imgPreview.setImageURI(it)
+                binding.imgPreview.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
             }
         }
 
@@ -46,19 +47,23 @@ class BarberArea : AppCompatActivity() {
         val description = binding.editDescription.text.toString()
 
         if (imageUri == null) {
-            mensage(view, "Escolha uma imagem primeiro!", "#FF0000")
+            message(view, "Escolha uma imagem do seu trabalho!", "#E74C3C")
             return
         }
 
         if (description.isEmpty()) {
-            mensage(view, "Dê uma descrição ao seu trabalho!", "#FF0000")
+            message(view, "Dê uma descrição ao seu trabalho!", "#E74C3C")
             return
         }
 
-        mensage(view, "Subindo imagem... aguarde.", "#2C3E50")
+        // Desativa botões durante o upload
+        binding.btnUpload.isEnabled = false
+        binding.btnUpload.text = "Enviando..."
+        message(view, "Enviando para o Portfólio...", "#2C3E50")
 
         val filename = UUID.randomUUID().toString()
-        val ref = FirebaseStorage.getInstance().getReference("/portfolio/$filename")
+        val storage = FirebaseStorage.getInstance()
+        val ref = storage.reference.child("portfolio").child(filename)
 
         ref.putFile(imageUri!!)
             .addOnSuccessListener {
@@ -67,7 +72,9 @@ class BarberArea : AppCompatActivity() {
                 }
             }
             .addOnFailureListener {
-                mensage(view, "Erro ao enviar imagem: ${it.message}", "#FF0000")
+                binding.btnUpload.isEnabled = true
+                binding.btnUpload.text = "Subir para o Portfólio"
+                message(view, "Erro no upload: ${it.message}", "#E74C3C")
             }
     }
 
@@ -81,18 +88,26 @@ class BarberArea : AppCompatActivity() {
 
         db.collection("portfolio").add(work)
             .addOnSuccessListener {
-                mensage(view, "Trabalho salvo no portfólio!", "#80CBC4")
+                message(view, "Trabalho salvo com sucesso!", "#80CBC4")
+                
+                // Limpa campos
                 binding.imgPreview.setImageResource(android.R.drawable.ic_menu_gallery)
+                binding.imgPreview.scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
                 binding.editDescription.text.clear()
                 imageUri = null
+                
+                binding.btnUpload.isEnabled = true
+                binding.btnUpload.text = "Subir para o Portfólio"
             }
             .addOnFailureListener {
-                mensage(view, "Erro ao salvar dados!", "#FF0000")
+                binding.btnUpload.isEnabled = true
+                binding.btnUpload.text = "Subir para o Portfólio"
+                message(view, "Erro ao salvar no banco!", "#E74C3C")
             }
     }
 
-    private fun mensage(view: View, mensage: String, color: String) {
-        val snackbar = Snackbar.make(view, mensage, Snackbar.LENGTH_SHORT)
+    private fun message(view: View, message: String, color: String) {
+        val snackbar = Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
         snackbar.setBackgroundTint(Color.parseColor(color))
         snackbar.setTextColor(Color.parseColor("#FFFFFF"))
         snackbar.show()

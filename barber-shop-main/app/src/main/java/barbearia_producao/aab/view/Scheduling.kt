@@ -1,11 +1,9 @@
 package barbearia_producao.aab.view
 
 import android.graphics.Color
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import androidx.annotation.RequiresApi
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.firestore.FirebaseFirestore
 import barbearia_producao.aab.databinding.ActivitySchedulingBinding
@@ -15,107 +13,59 @@ class Scheduling : AppCompatActivity() {
 
     private lateinit var binding: ActivitySchedulingBinding
     private val calendar: Calendar = Calendar.getInstance()
-    private var date: String = ""
-    private var hour: String = ""
+    private var data: String = ""
+    private var hora: String = ""
 
-
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySchedulingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         supportActionBar?.hide()
-
-        val name = intent.extras?.getString("name").toString()
-        val service = intent.extras?.getString("service").toString()
-        val price = intent.extras?.getString("price").toString()
+        val name = intent.extras?.getString("name") ?: "Cliente"
+        val service = intent.extras?.getString("service") ?: "Corte"
+        val price = intent.extras?.getString("price") ?: "R$ 30,00"
 
         val datePicker = binding.datePicker
-        datePicker.setOnDateChangedListener { _, year, monthOfYear, dayOfMOnth ->
+        datePicker.setOnDateChangedListener { _, year, monthOfYear, dayOfMonth ->
             calendar.set(Calendar.YEAR, year)
             calendar.set(Calendar.MONTH, monthOfYear)
-            calendar.set(Calendar.DAY_OF_MONTH, dayOfMOnth)
+            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
 
-            var day = dayOfMOnth.toString()
-            val month: String
+            val day = if (dayOfMonth < 10) "0$dayOfMonth" else dayOfMonth.toString()
+            val month = if (monthOfYear + 1 < 10) "0${monthOfYear + 1}" else (monthOfYear + 1).toString()
 
-            if (dayOfMOnth < 10) {
-                day = "0$dayOfMOnth"
-            }
-            if (monthOfYear < 10) {
-                month = "" + (monthOfYear + 1)
-            } else {
-                month = (monthOfYear + 1).toString()
-            }
-
-            date = "$day / $month / $year"
+            data = "$day / $month / $year"
         }
 
-        binding.timePicker.setOnTimeChangedListener { _, hourOfDay, minute ->
-
-            val minuto: String
-
-            if (minute < 10) {
-                minuto = "0$minute"
-            } else {
-                minuto = minute.toString()
-            }
-
-            hour = "$hourOfDay:$minuto" // 19:00
+        val timePicker = binding.timePicker
+        timePicker.setIs24HourView(true)
+        timePicker.setOnTimeChangedListener { _, hourOfDay, minute ->
+            val min = if (minute < 10) "0$minute" else minute.toString()
+            hora = "$hourOfDay:$min"
         }
-
-        binding.timePicker.setIs24HourView(true)
 
         binding.btnAgendar.setOnClickListener {
-
-            val barber1 = binding.barber1
+            val barbeiro = if (binding.barber1.isChecked) "Diego" else ""
 
             when {
-                hour.isEmpty() -> {
-                    mensage(it, "Preenchar o horário!", "#FF0000")
+                hora.isEmpty() -> {
+                    message(it, "Preencha o horário!", "#FF0000")
                 }
-
-                hour < "8:00" && hour > "19:00" -> {
-                    mensage(
-                        it,
-                        "DIH CORTE'S está fechado - horário de atedimento das 08:00 as 19:00!",
-                        "#FF0000"
-                    )
+                data.isEmpty() -> {
+                    message(it, "Preencha a data!", "#FF0000")
                 }
-
-                date.isEmpty() -> {
-                    mensage(it, "Coloque uma data", "#FF0000")
+                barbeiro.isEmpty() -> {
+                    message(it, "Escolha o profissional!", "#FF0000")
                 }
-
-                barber1.isChecked && date.isNotEmpty() && hour.isNotEmpty() -> {
-                    saveScheduling(it, name, "Diego", date, hour, service, price)
-                }
-
                 else -> {
-                    mensage(it, "Escolha um barbeiro", "#FF0000")
+                    saveScheduling(it, name, barbeiro, data, hora, service, price)
                 }
             }
         }
     }
 
-    private fun mensage(view: View, mensage: String, color: String) {
-        val snackbar = Snackbar.make(view, mensage, Snackbar.LENGTH_SHORT)
-        snackbar.setBackgroundTint(Color.parseColor(color))
-        snackbar.setTextColor(Color.parseColor("#FFFFFF"))
-        snackbar.show()
-    }
-
-    private fun saveScheduling(
-        view: View,
-        cliente: String,
-        barbeiro: String,
-        data: String,
-        hora: String,
-        service: String,
-        price: String
-    ) {
-
+    private fun saveScheduling(view: View, cliente: String, barbeiro: String, data: String, hora: String, service: String, price: String) {
         val db = FirebaseFirestore.getInstance()
 
         val dataUser = hashMapOf(
@@ -125,14 +75,26 @@ class Scheduling : AppCompatActivity() {
             "hora" to hora,
             "servico" to service,
             "valor" to price,
-            "status" to "pendente"
+            "status" to "pendente",
+            "timestamp" to System.currentTimeMillis()
         )
 
-        db.collection("agendamento").document(cliente).set(dataUser).addOnCompleteListener {
-            mensage(view, "Agendamento realizado com sucesso!", "#80CBC4")
-        }.addOnFailureListener {
-            mensage(view, "Erro ao salvar!", "#FF0000")
+        // Usa ID aleatório para não sobrepor agendamentos do mesmo cliente
+        db.collection("agendamento").add(dataUser).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                message(view, "Agendamento realizado com sucesso!", "#80CBC4")
+                // Finaliza a tela após 1.5 segundos
+                view.postDelayed({ finish() }, 1500)
+            } else {
+                message(view, "Erro ao agendar. Tente novamente!", "#FF0000")
+            }
         }
     }
 
+    private fun message(view: View, message: String, color: String) {
+        val snackbar = Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
+        snackbar.setBackgroundTint(Color.parseColor(color))
+        snackbar.setTextColor(Color.parseColor("#FFFFFF"))
+        snackbar.show()
+    }
 }

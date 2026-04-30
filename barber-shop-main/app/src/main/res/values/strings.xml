@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">DIH CORTE\'S</string>
-    <string name="edit_password">Senha</string>
-    <string name="edit_name">Nome</string>
-    <string name="btn_login">Login</string>
-    <string name="text_services">Todos os serviços</string>
-    <string name="text_corte_de_cabelo">Corte de Cabelo</string>
-    <string name="text_agendamento">Agendamento</string>
+    <string name="edit_password">Sua Senha</string>
+    <string name="edit_name">Seu Nome</string>
+    <string name="btn_login">Entrar no App</string>
+    <string name="text_services">Nossos Serviços</string>
+    <string name="text_corte_de_cabelo">Corte Masculino</string>
+    <string name="text_agendamento">Agende seu horário com o Diego</string>
 </resources>
