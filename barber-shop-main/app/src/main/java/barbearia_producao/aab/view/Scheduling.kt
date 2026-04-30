@@ -68,8 +68,6 @@ class Scheduling : AppCompatActivity() {
         binding.btnAgendar.setOnClickListener {
 
             val barber1 = binding.barber1
-            val barber2 = binding.barber2
-            val barber3 = binding.barber3
 
             when {
                 hour.isEmpty() -> {
@@ -79,7 +77,7 @@ class Scheduling : AppCompatActivity() {
                 hour < "8:00" && hour > "19:00" -> {
                     mensage(
                         it,
-                        "Barber Shop está fechado - horário de atedimento das 08:00 as 19:00!",
+                        "DIH CORTE'S está fechado - horário de atedimento das 08:00 as 19:00!",
                         "#FF0000"
                     )
                 }
@@ -89,15 +87,7 @@ class Scheduling : AppCompatActivity() {
                 }
 
                 barber1.isChecked && date.isNotEmpty() && hour.isNotEmpty() -> {
-                    saveScheduling(it, name, "Cristiano Ronaldo", date, hour)
-                }
-
-                barber2.isChecked && date.isNotEmpty() && hour.isNotEmpty() -> {
-                    saveScheduling(it, name, "Bob Firmino", date, hour)
-                }
-
-                barber3.isChecked && date.isNotEmpty() && hour.isNotEmpty() -> {
-                    saveScheduling(it, name, "Gabigol da Silva", date, hour)
+                    saveScheduling(it, name, "Diego", date, hour)
                 }
 
                 else -> {

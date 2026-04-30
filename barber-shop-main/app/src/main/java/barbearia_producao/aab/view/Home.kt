@@ -40,16 +40,19 @@ class Home : AppCompatActivity() {
     }
 
     private fun getService() {
-        val servicesOne = Services(R.drawable.img1, "Corte de Cabelo")
+        val servicesOne = Services(R.drawable.img1, "Cortes")
         listServices.add(servicesOne)
 
         val servicesTwo = Services(R.drawable.img2, "Corte de barba")
         listServices.add(servicesTwo)
 
-        val servicesThree = Services(R.drawable.img3, "Lavagem de cabelo")
+        val servicesThree = Services(R.drawable.img3, "Corte especiais")
         listServices.add(servicesThree)
 
-        val servicesFour = Services(R.drawable.img4, "Tratamento de cabelo")
+        val servicesFour = Services(R.drawable.img4, "Tratamento")
         listServices.add(servicesFour)
+
+        val servicesFive = Services(R.drawable.img1, "Luzes")
+        listServices.add(servicesFive)
     }
 }
