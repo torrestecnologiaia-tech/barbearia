@@ -5,6 +5,8 @@ import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import barbearia_producao.aab.R
@@ -19,7 +21,6 @@ import com.google.firebase.firestore.Query
 
 class Home : AppCompatActivity() {
 
-    // DIH CORTE'S - Home Activity com Galeria e Serviços
     private lateinit var binding: ActivityHomeBinding
     private lateinit var servicesAdapter: ServicesAdapter
     private lateinit var portfolioAdapter: PortfolioAdapter
@@ -50,11 +51,9 @@ class Home : AppCompatActivity() {
         val recyclerViewServices = binding.recycleViewService
         recyclerViewServices.layoutManager = GridLayoutManager(this, 2)
         servicesAdapter = ServicesAdapter(this, listServices) { service ->
-            // Seleciona o serviço ao clicar
             selectedService = service.name
             selectedPrice = service.price
             
-            // Navega direto para agendamento
             val intent = Intent(this, Scheduling::class.java)
             intent.putExtra("name", name)
             intent.putExtra("service", selectedService)
@@ -68,7 +67,6 @@ class Home : AppCompatActivity() {
 
         binding.btnSchedule.setOnClickListener {
             if (selectedService == null) {
-                // Se não selecionou nada, usa o primeiro como padrão mas avisa
                 selectedService = listServices[0].name
                 selectedPrice = listServices[0].price
             }
@@ -81,9 +79,32 @@ class Home : AppCompatActivity() {
         }
         
         binding.btnBarberArea.setOnClickListener {
-            val intent = Intent(this, BarberArea::class.java)
-            startActivity(intent)
+            showPasswordDialog()
         }
+    }
+
+    private fun showPasswordDialog() {
+        val editText = EditText(this)
+        editText.inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
+        editText.hint = "Senha do Diego"
+
+        AlertDialog.Builder(this)
+            .setTitle("Área Restrita")
+            .setMessage("Por favor, insira a senha para acessar:")
+            .setView(editText)
+            .setPositiveButton("Entrar") { _, _ ->
+                val password = editText.text.toString()
+                if (password == "23111991") {
+                    val intent = Intent(this, BarberArea::class.java)
+                    startActivity(intent)
+                } else {
+                    Snackbar.make(binding.root, "Senha incorreta!", Snackbar.LENGTH_SHORT)
+                        .setBackgroundTint(Color.RED)
+                        .show()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
 
     private fun getService() {
@@ -101,9 +122,7 @@ class Home : AppCompatActivity() {
         db.collection("portfolio")
             .orderBy("timestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { value, error ->
-                if (error != null) {
-                    return@addSnapshotListener
-                }
+                if (error != null) return@addSnapshotListener
                 
                 listPortfolio.clear()
                 value?.documents?.forEach { doc ->

@@ -1,23 +1,30 @@
 package barbearia_producao.aab.view
 
-import android.app.Activity
-import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import barbearia_producao.aab.adapter.ManagementAdapter
 import barbearia_producao.aab.databinding.ActivityBarberAreaBinding
+import barbearia_producao.aab.model.Portfolio
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
-import java.util.UUID
+import java.util.*
 
 class BarberArea : AppCompatActivity() {
 
     private lateinit var binding: ActivityBarberAreaBinding
     private var imageUri: Uri? = null
+    private val listPortfolio: MutableList<Portfolio> = mutableListOf()
+    private lateinit var adapter: ManagementAdapter
+    private var editingItem: Portfolio? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +32,14 @@ class BarberArea : AppCompatActivity() {
         setContentView(binding.root)
 
         supportActionBar?.hide()
+
+        // Configura a lista de gerenciamento
+        adapter = ManagementAdapter(this, listPortfolio, 
+            onDelete = { item -> showDeleteConfirmation(item) },
+            onEdit = { item -> startEditing(item) }
+        )
+        binding.rvManagement.layoutManager = LinearLayoutManager(this)
+        binding.rvManagement.adapter = adapter
 
         val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             uri?.let {
@@ -39,31 +54,53 @@ class BarberArea : AppCompatActivity() {
         }
 
         binding.btnUpload.setOnClickListener {
-            uploadImage(it)
+            if (editingItem != null) {
+                updateInFirestore()
+            } else {
+                uploadImage(it)
+            }
         }
+        
+        loadPortfolio()
+    }
+
+    private fun loadPortfolio() {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("portfolio")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .addSnapshotListener { value, error ->
+                if (error != null) return@addSnapshotListener
+                
+                listPortfolio.clear()
+                value?.documents?.forEach { doc ->
+                    val portfolio = doc.toObject(Portfolio::class.java)
+                    if (portfolio != null) {
+                        portfolio.id = doc.id
+                        listPortfolio.add(portfolio)
+                    }
+                }
+                adapter.notifyDataSetChanged()
+            }
     }
 
     private fun uploadImage(view: View) {
         val description = binding.editDescription.text.toString()
 
         if (imageUri == null) {
-            message(view, "Escolha uma imagem do seu trabalho!", "#E74C3C")
+            message(view, "Escolha uma imagem!", "#E74C3C")
             return
         }
 
         if (description.isEmpty()) {
-            message(view, "Dê uma descrição ao seu trabalho!", "#E74C3C")
+            message(view, "Preencha a descrição!", "#E74C3C")
             return
         }
 
-        // Desativa botões durante o upload
         binding.btnUpload.isEnabled = false
         binding.btnUpload.text = "Enviando..."
-        message(view, "Enviando para o Portfólio...", "#2C3E50")
 
         val filename = UUID.randomUUID().toString()
-        val storage = FirebaseStorage.getInstance()
-        val ref = storage.reference.child("portfolio").child(filename)
+        val ref = FirebaseStorage.getInstance().reference.child("portfolio").child(filename)
 
         ref.putFile(imageUri!!)
             .addOnSuccessListener {
@@ -72,9 +109,8 @@ class BarberArea : AppCompatActivity() {
                 }
             }
             .addOnFailureListener {
-                binding.btnUpload.isEnabled = true
-                binding.btnUpload.text = "Subir para o Portfólio"
-                message(view, "Erro no upload: ${it.message}", "#E74C3C")
+                resetUI()
+                message(view, "Erro no Storage: ${it.message}", "#E74C3C")
             }
     }
 
@@ -88,28 +124,69 @@ class BarberArea : AppCompatActivity() {
 
         db.collection("portfolio").add(work)
             .addOnSuccessListener {
-                message(view, "Trabalho salvo com sucesso!", "#80CBC4")
-                
-                // Limpa campos
-                binding.imgPreview.setImageResource(android.R.drawable.ic_menu_gallery)
-                binding.imgPreview.scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
-                binding.editDescription.text.clear()
-                imageUri = null
-                
-                binding.btnUpload.isEnabled = true
-                binding.btnUpload.text = "Subir para o Portfólio"
+                message(view, "Salvo com sucesso!", "#1ABC9C")
+                resetUI()
             }
             .addOnFailureListener {
-                binding.btnUpload.isEnabled = true
-                binding.btnUpload.text = "Subir para o Portfólio"
-                message(view, "Erro ao salvar no banco!", "#E74C3C")
+                resetUI()
+                message(view, "Erro no Banco de Dados!", "#E74C3C")
             }
+    }
+
+    private fun startEditing(item: Portfolio) {
+        editingItem = item
+        binding.editDescription.setText(item.description)
+        binding.btnUpload.text = "Salvar Alterações"
+        binding.btnSelectImg.visibility = View.GONE
+        binding.imgPreview.visibility = View.GONE
+        message(binding.root, "Editando descrição...", "#3498DB")
+    }
+
+    private fun updateInFirestore() {
+        val newDesc = binding.editDescription.text.toString()
+        val item = editingItem ?: return
+        
+        FirebaseFirestore.getInstance().collection("portfolio").document(item.id!!)
+            .update("description", newDesc)
+            .addOnSuccessListener {
+                message(binding.root, "Atualizado com sucesso!", "#1ABC9C")
+                resetUI()
+            }
+    }
+
+    private fun showDeleteConfirmation(item: Portfolio) {
+        AlertDialog.Builder(this)
+            .setTitle("Excluir Trabalho")
+            .setMessage("Tem certeza que deseja excluir este item do portfólio?")
+            .setPositiveButton("Sim") { _, _ ->
+                deleteItem(item)
+            }
+            .setNegativeButton("Não", null)
+            .show()
+    }
+
+    private fun deleteItem(item: Portfolio) {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("portfolio").document(item.id!!).delete()
+            .addOnSuccessListener {
+                message(binding.root, "Excluído com sucesso!", "#E74C3C")
+            }
+    }
+
+    private fun resetUI() {
+        binding.btnUpload.isEnabled = true
+        binding.btnUpload.text = "Subir para o Portfólio"
+        binding.editDescription.text.clear()
+        binding.imgPreview.setImageResource(android.R.drawable.ic_menu_gallery)
+        binding.btnSelectImg.visibility = View.VISIBLE
+        binding.imgPreview.visibility = View.VISIBLE
+        imageUri = null
+        editingItem = null
     }
 
     private fun message(view: View, message: String, color: String) {
         val snackbar = Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
         snackbar.setBackgroundTint(Color.parseColor(color))
-        snackbar.setTextColor(Color.parseColor("#FFFFFF"))
         snackbar.show()
     }
 }

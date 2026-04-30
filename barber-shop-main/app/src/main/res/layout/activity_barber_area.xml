@@ -1,70 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/midnightblue"
-    android:padding="20dp">
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="20dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Área do Profissional"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:text="Painel do Diego"
             android:textColor="@color/white"
             android:textSize="24sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginBottom="30dp"/>
+            android:textStyle="bold" />
 
+        <!-- Seção de Novo Upload -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="wrap_content"
             app:cardCornerRadius="15dp"
-            app:cardBackgroundColor="@color/white"
-            android:layout_marginBottom="20dp">
+            app:cardBackgroundColor="#1A252F"
+            android:layout_marginBottom="30dp">
 
-            <ImageView
-                android:id="@+id/imgPreview"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerInside"
-                android:src="@drawable/ic_launcher_background"
-                android:padding="20dp"/>
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="15dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Novo Trabalho"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="10dp"/>
+
+                <ImageView
+                    android:id="@+id/imgPreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_launcher_background"
+                    android:layout_marginBottom="10dp"/>
+
+                <Button
+                    android:id="@+id/btnSelectImg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Escolher Foto"
+                    android:backgroundTint="#3498DB"
+                    android:layout_marginBottom="10dp"/>
+
+                <EditText
+                    android:id="@+id/editDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="O que você fez? (ex: Corte Social)"
+                    android:textColor="@color/white"
+                    android:textColorHint="#95A5A6"
+                    android:backgroundTint="@color/white"
+                    android:layout_marginBottom="15dp"/>
+
+                <Button
+                    android:id="@+id/btnUpload"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="PUBLICAR NO PORTFÓLIO"
+                    android:backgroundTint="#1ABC9C"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <Button
-            android:id="@+id/btnSelectImg"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Selecionar do Trabalho"
-            android:backgroundTint="@color/alizarin"
+            android:text="Gerenciar Portfólio"
             android:textColor="@color/white"
-            android:layout_marginBottom="10dp"
-            android:textAllCaps="false"/>
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="10dp"/>
 
-        <EditText
-            android:id="@+id/editDescription"
+        <!-- Lista de Gerenciamento (Edit/Excluir) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvManagement"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Descrição do trabalho (ex: Degradê Navalhado)"
-            android:backgroundTint="@color/white"
-            android:textColor="@color/white"
-            android:textColorHint="#CCCCCC"
-            android:layout_marginBottom="20dp"/>
-
-        <Button
-            android:id="@+id/btnUpload"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Subir para o Portfólio"
-            android:backgroundTint="@color/alizarin"
-            android:textColor="@color/white"
-            android:textAllCaps="false"/>
+            android:nestedScrollingEnabled="false"
+            tools:listitem="@layout/management_item"/>
 
     </LinearLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>
