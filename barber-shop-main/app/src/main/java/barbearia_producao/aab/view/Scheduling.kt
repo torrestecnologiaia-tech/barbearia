@@ -86,13 +86,35 @@ class Scheduling : AppCompatActivity() {
 
         db.collection("agendamento").add(dataUser).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                message(view, "Agendamento realizado! Veremos você em breve.", "#80CBC4")
-                view.postDelayed({ finish() }, 1500)
+                message(view, "Agendamento realizado! Enviando para o WhatsApp...", "#80CBC4")
+                
+                val mensagem = "Olá Diego! Novo agendamento:\n\n" +
+                        "*Cliente*: $cliente\n" +
+                        "*Serviço*: $service\n" +
+                        "*Data*: $data\n" +
+                        "*Hora*: $hora\n" +
+                        "*Valor*: $price"
+                
+                openWhatsApp(mensagem)
+                
+                view.postDelayed({ finish() }, 2500)
             } else {
                 binding.btnAgendar.isEnabled = true
                 binding.btnAgendar.text = "Agendar"
                 message(view, "Erro do Firebase. Verifique suas regras no console!", "#E74C3C")
             }
+        }
+    }
+
+    private fun openWhatsApp(msg: String) {
+        val phone = "5511999999999" // TODO: Diego deve trocar pelo número dele
+        try {
+            val intent = android.content.Intent(android.content.Intent.ACTION_VIEW)
+            val url = "https://api.whatsapp.com/send?phone=$phone&text=" + java.net.URLEncoder.encode(msg, "UTF-8")
+            intent.data = android.net.Uri.parse(url)
+            startActivity(intent)
+        } catch (e: Exception) {
+            // WhatsApp não instalado ou erro na intent
         }
     }
 
