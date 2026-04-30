@@ -13,6 +13,9 @@
         android:theme="@style/Theme.BarberShop"
         tools:targetApi="31">
         <activity
+            android:name=".view.BarberArea"
+            android:exported="false" />
+        <activity
             android:name=".view.Scheduling"
             android:exported="false" />
         <activity

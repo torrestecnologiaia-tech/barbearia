@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/midnightblue"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Área do Profissional"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="30dp"/>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            app:cardCornerRadius="15dp"
+            app:cardBackgroundColor="@color/white"
+            android:layout_marginBottom="20dp">
+
+            <ImageView
+                android:id="@+id/imgPreview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_launcher_background"
+                android:padding="20dp"/>
+        </androidx.cardview.widget.CardView>
+
+        <Button
+            android:id="@+id/btnSelectImg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Selecionar do Trabalho"
+            android:backgroundTint="@color/alizarin"
+            android:textColor="@color/white"
+            android:layout_marginBottom="10dp"
+            android:textAllCaps="false"/>
+
+        <EditText
+            android:id="@+id/editDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Descrição do trabalho (ex: Degradê Navalhado)"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/white"
+            android:textColorHint="#CCCCCC"
+            android:layout_marginBottom="20dp"/>
+
+        <Button
+            android:id="@+id/btnUpload"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Subir para o Portfólio"
+            android:backgroundTint="@color/alizarin"
+            android:textColor="@color/white"
+            android:textAllCaps="false"/>
+
+    </LinearLayout>
+</ScrollView>

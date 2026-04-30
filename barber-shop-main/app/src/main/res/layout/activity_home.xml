@@ -29,6 +29,29 @@
         app:layout_constraintTop_toBottomOf="@+id/textName" />
 
     <TextView
+        android:id="@+id/textTitlePortfolio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:gravity="start"
+        android:text="Nosso Trabalho"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewPortfolio"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textTitlePortfolio" />
+
+    <TextView
         android:id="@+id/textTitleService"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -39,13 +62,14 @@
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search" />
+        app:layout_constraintTop_toBottomOf="@+id/recyclerViewPortfolio" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycleViewService"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/btnSchedule"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textTitleService" />
@@ -56,7 +80,6 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="100dp"
         android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
         android:backgroundTint="@color/alizarin"
         android:drawableEnd="@drawable/baseline_arrow_forward_24"
         android:padding="15dp"
@@ -64,10 +87,26 @@
         android:textSize="18sp"
         android:textStyle="bold"
         app:cornerRadius="15dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/btnBarberArea"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/recycleViewService" />
+
+    <Button
+        android:id="@+id/btnBarberArea"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="100dp"
+        android:layout_marginBottom="20dp"
+        android:backgroundTint="#34495E"
+        android:padding="10dp"
+        android:text="ÁREA DO PROFISSIONAL"
+        android:textSize="12sp"
+        android:textColor="@color/white"
+        app:cornerRadius="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
