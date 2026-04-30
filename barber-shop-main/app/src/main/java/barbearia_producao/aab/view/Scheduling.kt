@@ -107,7 +107,7 @@ class Scheduling : AppCompatActivity() {
     }
 
     private fun openWhatsApp(msg: String) {
-        val phone = "5511999999999" // TODO: Diego deve trocar pelo número dele
+        val phone = "5511992184639" 
         try {
             val intent = android.content.Intent(android.content.Intent.ACTION_VIEW)
             val url = "https://api.whatsapp.com/send?phone=$phone&text=" + java.net.URLEncoder.encode(msg, "UTF-8")
