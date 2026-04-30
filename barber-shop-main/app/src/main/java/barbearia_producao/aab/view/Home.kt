@@ -16,6 +16,8 @@ import com.google.firebase.firestore.Query
 
 class Home : AppCompatActivity() {
 
+    // DIH CORTE'S - Home Activity com Galeria e Serviços
+
     private lateinit var binding: ActivityHomeBinding
     private lateinit var servicesAdapter: ServicesAdapter
     private lateinit var portfolioAdapter: PortfolioAdapter
