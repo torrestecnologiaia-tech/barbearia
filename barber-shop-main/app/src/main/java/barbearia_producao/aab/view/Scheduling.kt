@@ -26,37 +26,38 @@ class Scheduling : AppCompatActivity() {
         val service = intent.extras?.getString("service") ?: "Corte"
         val price = intent.extras?.getString("price") ?: "R$ 30,00"
 
-        val datePicker = binding.datePicker
-        datePicker.setOnDateChangedListener { _, year, monthOfYear, dayOfMonth ->
-            calendar.set(Calendar.YEAR, year)
-            calendar.set(Calendar.MONTH, monthOfYear)
-            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+        // Inicializar com os valores atuais dos pickers para evitar erro se o usuário não mexer neles
+        val initialDay = binding.datePicker.dayOfMonth
+        val initialMonth = binding.datePicker.month + 1
+        val initialYear = binding.datePicker.year
+        data = String.format("%02d / %02d / %d", initialDay, initialMonth, initialYear)
 
-            val day = if (dayOfMonth < 10) "0$dayOfMonth" else dayOfMonth.toString()
-            val month = if (monthOfYear + 1 < 10) "0${monthOfYear + 1}" else (monthOfYear + 1).toString()
+        val initialHour = binding.timePicker.hour
+        val initialMinute = binding.timePicker.minute
+        hora = String.format("%02d:%02d", initialHour, initialMinute)
 
-            data = "$day / $month / $year"
+        binding.datePicker.setOnDateChangedListener { _, year, monthOfYear, dayOfMonth ->
+            val month = monthOfYear + 1
+            data = String.format("%02d / %02d / %d", dayOfMonth, month, year)
         }
 
-        val timePicker = binding.timePicker
-        timePicker.setIs24HourView(true)
-        timePicker.setOnTimeChangedListener { _, hourOfDay, minute ->
-            val min = if (minute < 10) "0$minute" else minute.toString()
-            hora = "$hourOfDay:$min"
+        binding.timePicker.setIs24HourView(true)
+        binding.timePicker.setOnTimeChangedListener { _, hourOfDay, minute ->
+            hora = String.format("%02d:%02d", hourOfDay, minute)
         }
 
         binding.btnAgendar.setOnClickListener {
             val barbeiro = if (binding.barber1.isChecked) "Diego" else ""
 
             when {
-                hora.isEmpty() -> {
-                    message(it, "Preencha o horário!", "#FF0000")
-                }
                 data.isEmpty() -> {
-                    message(it, "Preencha a data!", "#FF0000")
+                    message(it, "Escolha uma data!", "#E74C3C")
+                }
+                hora.isEmpty() -> {
+                    message(it, "Escolha um horário!", "#E74C3C")
                 }
                 barbeiro.isEmpty() -> {
-                    message(it, "Escolha o profissional!", "#FF0000")
+                    message(it, "O profissional Diego deve estar selecionado!", "#E74C3C")
                 }
                 else -> {
                     saveScheduling(it, name, barbeiro, data, hora, service, price)
@@ -79,14 +80,18 @@ class Scheduling : AppCompatActivity() {
             "timestamp" to System.currentTimeMillis()
         )
 
-        // Usa ID aleatório para não sobrepor agendamentos do mesmo cliente
+        // Desativa o botão para evitar cliques duplos
+        binding.btnAgendar.isEnabled = false
+        binding.btnAgendar.text = "Salvando..."
+
         db.collection("agendamento").add(dataUser).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                message(view, "Agendamento realizado com sucesso!", "#80CBC4")
-                // Finaliza a tela após 1.5 segundos
+                message(view, "Agendamento realizado! Veremos você em breve.", "#80CBC4")
                 view.postDelayed({ finish() }, 1500)
             } else {
-                message(view, "Erro ao agendar. Tente novamente!", "#FF0000")
+                binding.btnAgendar.isEnabled = true
+                binding.btnAgendar.text = "Agendar"
+                message(view, "Erro do Firebase. Verifique suas regras no console!", "#E74C3C")
             }
         }
     }
