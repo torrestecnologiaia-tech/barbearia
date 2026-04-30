@@ -27,32 +27,43 @@ class Home : AppCompatActivity() {
         binding.textName.text = "Bem vindo(a), ${name}"
         val recyclerViewServices = binding.recycleViewService
         recyclerViewServices.layoutManager = GridLayoutManager(this, 2)
-        servicesAdapter = ServicesAdapter(this, listServices)
+        
+        servicesAdapter = ServicesAdapter(this, listServices) { service ->
+            val intent = Intent(this, Scheduling::class.java)
+            intent.putExtra("name", name)
+            intent.putExtra("service", service.name)
+            intent.putExtra("price", service.price)
+            startActivity(intent)
+        }
+        
         recyclerViewServices.setHasFixedSize(true)
         recyclerViewServices.adapter = servicesAdapter
         getService()
 
         binding.btnSchedule.setOnClickListener {
+            // Se clicar no botão de baixo sem escolher, vai com o primeiro serviço por padrão
             val intent = Intent(this, Scheduling::class.java)
             intent.putExtra("name", name)
+            intent.putExtra("service", listServices[0].name)
+            intent.putExtra("price", listServices[0].price)
             startActivity(intent)
         }
     }
 
     private fun getService() {
-        val servicesOne = Services(R.drawable.img1, "Cortes")
+        val servicesOne = Services(R.drawable.img1, "Cortes", "R$ 30,00")
         listServices.add(servicesOne)
 
-        val servicesTwo = Services(R.drawable.img2, "Corte de barba")
+        val servicesTwo = Services(R.drawable.img2, "Corte de barba", "R$ 20,00")
         listServices.add(servicesTwo)
 
-        val servicesThree = Services(R.drawable.img3, "Corte especiais")
+        val servicesThree = Services(R.drawable.img3, "Corte especiais", "R$ 50,00")
         listServices.add(servicesThree)
 
-        val servicesFour = Services(R.drawable.img4, "Tratamento")
+        val servicesFour = Services(R.drawable.img4, "Tratamento", "R$ 40,00")
         listServices.add(servicesFour)
 
-        val servicesFive = Services(R.drawable.img1, "Luzes")
+        val servicesFive = Services(R.drawable.img1, "Luzes", "R$ 100,00")
         listServices.add(servicesFive)
     }
 }

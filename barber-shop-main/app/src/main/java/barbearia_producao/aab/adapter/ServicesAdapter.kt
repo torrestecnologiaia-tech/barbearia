@@ -9,7 +9,8 @@ import barbearia_producao.aab.model.Services
 
 class ServicesAdapter(
     private val context: Context,
-    private val listServices: MutableList<Services>
+    private val listServices: MutableList<Services>,
+    private val onItemClick: (Services) -> Unit
 ) :
     RecyclerView.Adapter<ServicesAdapter.ServicesViewHolder>() {
 
@@ -21,13 +22,20 @@ class ServicesAdapter(
     override fun getItemCount() = listServices.size
 
     override fun onBindViewHolder(holder: ServicesViewHolder, position: Int) {
-        holder.imgService.setImageResource(listServices[position].img!!)
-        holder.textService.text = listServices[position].name
+        val service = listServices[position]
+        holder.imgService.setImageResource(service.img!!)
+        holder.textService.text = service.name
+        holder.textPrice.text = service.price
+        
+        holder.itemView.setOnClickListener {
+            onItemClick(service)
+        }
     }
 
     inner class ServicesViewHolder(binding: ServicesItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         val imgService = binding.imgService
         val textService = binding.textService
+        val textPrice = binding.textPrice
     }
 }

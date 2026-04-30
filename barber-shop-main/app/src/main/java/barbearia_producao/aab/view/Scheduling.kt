@@ -28,6 +28,8 @@ class Scheduling : AppCompatActivity() {
         supportActionBar?.hide()
 
         val name = intent.extras?.getString("name").toString()
+        val service = intent.extras?.getString("service").toString()
+        val price = intent.extras?.getString("price").toString()
 
         val datePicker = binding.datePicker
         datePicker.setOnDateChangedListener { _, year, monthOfYear, dayOfMOnth ->
@@ -87,7 +89,7 @@ class Scheduling : AppCompatActivity() {
                 }
 
                 barber1.isChecked && date.isNotEmpty() && hour.isNotEmpty() -> {
-                    saveScheduling(it, name, "Diego", date, hour)
+                    saveScheduling(it, name, "Diego", date, hour, service, price)
                 }
 
                 else -> {
@@ -109,7 +111,9 @@ class Scheduling : AppCompatActivity() {
         cliente: String,
         barbeiro: String,
         data: String,
-        hora: String
+        hora: String,
+        service: String,
+        price: String
     ) {
 
         val db = FirebaseFirestore.getInstance()
@@ -119,6 +123,9 @@ class Scheduling : AppCompatActivity() {
             "barbeiro" to barbeiro,
             "data" to data,
             "hora" to hora,
+            "servico" to service,
+            "valor" to price,
+            "status" to "pendente"
         )
 
         db.collection("agendamento").document(cliente).set(dataUser).addOnCompleteListener {
